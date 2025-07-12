@@ -2,7 +2,7 @@ import { useMutation } from 'convex/react';
 import React, { useState } from 'react'
 import { api } from '../../convex/_generated/api';
 import toast from 'react-hot-toast';
-import { X, Star, Trash2, Calendar } from 'lucide-react';
+import { X, Star, Trash2, Calendar, Edit2, Save, XCircle } from 'lucide-react';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
@@ -17,6 +17,11 @@ function FeedBackFrom() {
   const [hoverRating, setHoverRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPreviousFeedback, setShowPreviousFeedback] = useState(false);
+  const [editingFeedback, setEditingFeedback] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
+  const [editRating, setEditRating] = useState(0);
+  const [editHoverRating, setEditHoverRating] = useState(0);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const { user } = useUser();
   const userId = user?.id as string;
@@ -29,6 +34,7 @@ function FeedBackFrom() {
 
   const createFeedback = useMutation(api.feedback.createFeedback);
   const deleteFeedback = useMutation(api.feedback.deleteFeedbackById);
+  const updateFeedback = useMutation(api.feedback.updateFeedbackById);
 
   const handleSubmit = async(e: React.FormEvent)=>{
     e.preventDefault();
@@ -69,6 +75,47 @@ function FeedBackFrom() {
     }
   };
  
+  const handleEditFeedback = (feedback: any) => {
+    setEditingFeedback(feedback._id);
+    setEditText(feedback.description);
+    setEditRating(feedback.rating);
+    setEditHoverRating(0);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingFeedback(null);
+    setEditText("");
+    setEditRating(0);
+    setEditHoverRating(0);
+  };
+
+  const handleUpdateFeedback = async (feedbackId: string) => {
+    if (editRating === 0) {
+      toast.error("Please provide a rating");
+      return;
+    }
+
+    if (!editText.trim()) {
+      toast.error("Please provide feedback description");
+      return;
+    }
+
+    setIsUpdating(true);
+    try {
+      await updateFeedback({
+        feedbackId: feedbackId as any,
+        rating: editRating,
+        description: editText,
+      });
+      toast.success("Feedback updated successfully!");
+      handleCancelEdit();
+    } catch (error) {
+      console.log(error);
+      toast.error(error instanceof Error ? error.message : "Failed to update feedback");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
   // Show message if no active plan
   if (userId && activePlan === null) {
     return (
@@ -113,46 +160,126 @@ function FeedBackFrom() {
                 <Card key={feedback._id} className="glass border-border/50">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star
-                              key={star}
-                              className={`w-4 h-4 ${
-                                star <= feedback.rating
-                                  ? 'text-yellow-500 fill-yellow-500'
-                                  : 'text-gray-300 fill-gray-300'
-                              }`}
-                            />
-                          ))}
+                      {editingFeedback === feedback._id ? (
+                        <div className="w-full space-y-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium">Rating:</span>
+                            <div className="flex items-center gap-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                  type="button"
+                                  key={star}
+                                  onClick={() => setEditRating(star)}
+                                  onMouseEnter={() => setEditHoverRating(star)}
+                                  onMouseLeave={() => setEditHoverRating(0)}
+                                  className="p-1 transition-transform hover:scale-110 focus:outline-none"
+                                >
+                                  <Star
+                                    className={`w-5 h-5 ${
+                                      star <= (editHoverRating || editRating)
+                                        ? 'text-yellow-500 fill-yellow-500'
+                                        : 'text-gray-300 fill-gray-300'
+                                    }`}
+                                  />
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          <Textarea
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            className="min-h-[100px] bg-background/80"
+                            placeholder="Update your feedback..."
+                          />
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => handleUpdateFeedback(feedback._id)}
+                              disabled={isUpdating || editRating === 0}
+                              className="gradient-primary text-white"
+                            >
+                              {isUpdating ? (
+                                <span className="flex items-center gap-1">
+                                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  Updating...
+                                </span>
+                              ) : (
+                                <>
+                                  <Save className="w-4 h-4 mr-1" />
+                                  Save
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleCancelEdit}
+                              disabled={isUpdating}
+                            >
+                              <XCircle className="w-4 h-4 mr-1" />
+                              Cancel
+                            </Button>
+                          </div>
                         </div>
-                        <span className="text-sm text-muted-foreground">
-                          {feedback.rating}/5 stars
-                        </span>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDeleteFeedback(feedback._id)}
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className={`w-4 h-4 ${
+                                    star <= feedback.rating
+                                      ? 'text-yellow-500 fill-yellow-500'
+                                      : 'text-gray-300 fill-gray-300'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-sm text-muted-foreground">
+                              {feedback.rating}/5 stars
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditFeedback(feedback)}
+                              className="text-primary hover:text-primary hover:bg-primary/10 border-primary/30"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteFeedback(feedback._id)}
+                              className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-muted-foreground mb-2">
-                      "{feedback.description}"
-                    </p>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        <span>{new Date(feedback._creationTime).toLocaleDateString()}</span>
+                  {editingFeedback !== feedback._id && (
+                    <CardContent className="pt-0">
+                      <p className="text-sm text-muted-foreground mb-2">
+                        "{feedback.description}"
+                      </p>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          <span>{new Date(feedback._creationTime).toLocaleDateString()}</span>
+                        </div>
+                        <span>Goal: {feedback.fitness_goal}</span>
+                        <span>Age: {feedback.age}</span>
                       </div>
-                      <span>Goal: {feedback.fitness_goal}</span>
-                      <span>Age: {feedback.age}</span>
-                    </div>
-                  </CardContent>
+                    </CardContent>
+                  )}
                 </Card>
               ))}
             </div>
