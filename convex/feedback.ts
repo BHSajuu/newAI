@@ -16,10 +16,6 @@ export const createFeedback = mutation({
       args:{
          rating: v.number(),
          description: v.string(),
-         fitness_goal: v.string(),
-         age: v.string(),
-         workout_days: v.number(),
-         injuries: v.optional(v.string()),
       },
       handler: async (ctx, args)=>{
          const identify = await ctx.auth.getUserIdentity();
@@ -36,8 +32,30 @@ export const createFeedback = mutation({
             throw new Error("User not found");
          }
 
+        // Get the active plan to extract fitness data
+        const activePlan = await ctx.db
+          .query("plans")
+          .withIndex("by_user_id", (q) => q.eq("userId", user.clerkId))
+          .filter((q) => q.eq(q.field("isActive"), true))
+          .first();
+
+        if(!activePlan){
+          throw new Error("No active plan found. Please create a fitness plan first.");
+        }
+
+        // Extract fitness data from the active plan
+        // Extract fitness data from the active plan's userMetadata
+        const fitnessData = {
+          fitness_goal: activePlan.userMetadata?.fitness_goal || "General Fitness",
+          age: activePlan.userMetadata?.age || "Not specified",
+          workout_days: activePlan.workoutPlan.schedule.length,
+          injuries: activePlan.userMetadata?.injuries || "None specified",
+        };
+
          await ctx.db.insert("feedback",{
              ...args,
+             ...fitnessData,
+             planId: activePlan._id,
              userId: user._id,
              name: user.name,
              profilePic: identify.pictureUrl || "",

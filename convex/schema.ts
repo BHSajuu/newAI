@@ -40,6 +40,15 @@ export default defineSchema({
       ),
     }),
     isActive: v.boolean(),
+    userMetadata: v.optional(v.object({
+      age: v.string(),
+      height: v.string(),
+      weight: v.string(),
+      injuries: v.string(),
+      fitness_goal: v.string(),
+      fitness_level: v.string(),
+      dietary_restrictions: v.string(),
+    })),
   })
     .index("by_user_id", ["userId"])
     .index("by_active", ["isActive"]),
@@ -54,6 +63,8 @@ export default defineSchema({
      workout_days: v.number(),
      injuries: v.optional(v.string()),
      description: v.string(),
+     planId: v.string(), // Reference to the plan that was active when feedback was created
   }).index("by_user_id",["userId"])
-    .index("by_rating",["rating"]),
+    .index("by_rating",["rating"])
+    .index("by_plan_id",["planId"]),
 });

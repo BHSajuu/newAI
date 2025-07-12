@@ -7,6 +7,8 @@ import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
+import { useUser } from '@clerk/nextjs';
+import { useQuery } from 'convex/react';
 
 function FeedBackFrom() {
   const [text, setText] = useState("");
@@ -14,31 +16,58 @@ function FeedBackFrom() {
   const [hoverRating, setHoverRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const { user } = useUser();
+  const userId = user?.id as string;
+  
+  // Get active plan to check if user has one
+  const activePlan = useQuery(api.plans.getActivePlan, userId ? { userId } : "skip");
+
   const createFeedback = useMutation(api.feedback.createFeedback);
 
   const handleSubmit = async(e: React.FormEvent)=>{
     e.preventDefault();
+    
+    if (!activePlan) {
+      toast.error("Please create a fitness plan first before submitting feedback.");
+      return;
+    }
+    
     setIsSubmitting(true);
     try {
       await createFeedback({
          rating,
          description: text,
-         fitness_goal:"",
-         age:"",
-         workout_days:0,
-         injuries:"",
       })
       toast.success("Thank you for your feedback!");
       setText("");
       setRating(0);
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong while submitting your feedback. Please try again later.");
+      toast.error(error instanceof Error ? error.message : "Something went wrong while submitting your feedback. Please try again later.");
     } finally {
       setIsSubmitting(false);
     }
   }
  
+  // Show message if no active plan
+  if (userId && activePlan === null) {
+    return (
+      <div className='glass rounded-2xl p-6 mt-8'>
+        <div className='text-center'>
+          <h2 className='text-2xl font-bold mb-2'>Create a Plan First</h2>
+          <p className='text-muted-foreground mb-4'>
+            You need to have an active fitness plan before you can submit feedback.
+          </p>
+          <Button 
+            className="gradient-primary text-white"
+            onClick={() => window.location.href = '/generate-program'}
+          >
+            Generate Your Plan
+          </Button>
+        </div>
+      </div>
+    );
+  }
  
 
   return (
@@ -46,7 +75,14 @@ function FeedBackFrom() {
       <div className='flex items-center justify-between mb-6'>
         <div>
           <h2 className='text-2xl font-bold'>Share Your Experience</h2>
-          <p className='text-muted-foreground'>We value your feedback to improve our app</p>
+          <p className='text-muted-foreground'>
+            We value your feedback to improve our app
+            {activePlan && (
+              <span className='block text-sm mt-1 text-primary'>
+                Feedback for: {activePlan.name}
+              </span>
+            )}
+          </p>
         </div>
         <div className='flex items-center gap-2 px-3 py-2 glass rounded-full'>
           <Star className='w-4 h-4 text-yellow-500 fill-yellow-500' />
@@ -102,7 +138,7 @@ function FeedBackFrom() {
 
         <Button
           type="submit"
-          disabled={isSubmitting || rating === 0}
+          disabled={isSubmitting || rating === 0 || !activePlan}
           className="mt-2 bg-gradient-to-r from-primary to-secondary text-white rounded-xl 
           hover:opacity-90 transition-opacity py-6 text-base font-semibold shadow-lg
           disabled:opacity-50 disabled:cursor-not-allowed"

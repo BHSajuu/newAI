@@ -251,6 +251,16 @@ http.route({
         isActive: true,
         workoutPlan,
         name: `${fitness_goal} Plan - ${new Date().toLocaleDateString()}`,
+        // Store additional user data for feedback purposes
+        userMetadata: {
+          age,
+          height,
+          weight,
+          injuries,
+          fitness_goal,
+          fitness_level,
+          dietary_restrictions,
+        },
       });
 
       return new Response(

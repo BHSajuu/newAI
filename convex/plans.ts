@@ -30,6 +30,15 @@ export const createPlan = mutation({
       ),
     }),
     isActive: v.boolean(),
+    userMetadata: v.optional(v.object({
+      age: v.string(),
+      height: v.string(),
+      weight: v.string(),
+      injuries: v.string(),
+      fitness_goal: v.string(),
+      fitness_level: v.string(),
+      dietary_restrictions: v.string(),
+    })),
   },
   handler: async (ctx, args) => {
     const activePlans = await ctx.db
@@ -58,5 +67,18 @@ export const getUserPlans = query({
       .collect();
       
     return plans;
+  },
+});
+
+export const getActivePlan = query({
+  args: { userId: v.string() },
+  handler: async (ctx, args) => {
+    const activePlan = await ctx.db
+      .query("plans")
+      .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
+      .filter((q) => q.eq(q.field("isActive"), true))
+      .first();
+      
+    return activePlan;
   },
 });
