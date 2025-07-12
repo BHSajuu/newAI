@@ -1,0 +1,305 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  /* Base Variables */
+  --radius: 0.75rem;
+
+  /* Modern Fitness Theme Colors */
+  --fitness-dark: #0f0f23;
+  --fitness-darker: #08081a;
+  --fitness-primary: #6366f1;
+  --fitness-primary-light: #818cf8;
+  --fitness-primary-dark: #4f46e5;
+  --fitness-secondary: #10b981;
+  --fitness-accent: #f59e0b;
+  --fitness-surface: #1a1a2e;
+  --fitness-surface-light: #16213e;
+
+  /* Background */
+  --background: var(--fitness-dark);
+  --foreground: #f8fafc;
+
+  /* Card and popover elements */
+  --card: var(--fitness-surface);
+  --card-foreground: #f8fafc;
+  --popover: var(--fitness-surface);
+  --popover-foreground: #f8fafc;
+
+  /* Primary - Modern indigo */
+  --primary: var(--fitness-primary);
+  --primary-foreground: #ffffff;
+
+  /* Secondary - Emerald green */
+  --secondary: var(--fitness-secondary);
+  --secondary-foreground: #ffffff;
+
+  /* Accent - Amber */
+  --accent: var(--fitness-accent);
+  --accent-foreground: var(--fitness-dark);
+
+  /* Muted elements */
+  --muted: var(--fitness-surface-light);
+  --muted-foreground: #94a3b8;
+
+  /* System colors */
+  --destructive: #ef4444;
+  --border: rgba(99, 102, 241, 0.15);
+  --input: rgba(99, 102, 241, 0.1);
+  --ring: var(--fitness-primary);
+
+  /* Chart colors */
+  --chart-1: var(--fitness-primary);
+  --chart-2: var(--fitness-secondary);
+  --chart-3: var(--fitness-accent);
+  --chart-4: #8b5cf6;
+  --chart-5: #06b6d4;
+
+  /* Sidebar colors */
+  --sidebar: var(--fitness-surface);
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: var(--fitness-primary);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--fitness-secondary);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(99, 102, 241, 0.15);
+  --sidebar-ring: var(--fitness-primary);
+
+  /* Custom Variables */
+  --gradient-primary: linear-gradient(135deg, var(--fitness-primary) 0%, var(--fitness-primary-light) 100%);
+  --gradient-secondary: linear-gradient(135deg, var(--fitness-secondary) 0%, #34d399 100%);
+  --gradient-surface: linear-gradient(135deg, var(--fitness-surface) 0%, var(--fitness-surface-light) 100%);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+  --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.dark {
+  /* Same as root for dark theme */
+  --background: var(--fitness-dark);
+  --foreground: #f8fafc;
+  --card: var(--fitness-surface);
+  --card-foreground: #f8fafc;
+  --popover: var(--fitness-surface);
+  --popover-foreground: #f8fafc;
+  --primary: var(--fitness-primary);
+  --primary-foreground: #ffffff;
+  --secondary: var(--fitness-secondary);
+  --secondary-foreground: #ffffff;
+  --accent: var(--fitness-accent);
+  --accent-foreground: var(--fitness-dark);
+  --muted: var(--fitness-surface-light);
+  --muted-foreground: #94a3b8;
+  --destructive: #ef4444;
+  --border: rgba(99, 102, 241, 0.15);
+  --input: rgba(99, 102, 241, 0.1);
+  --ring: var(--fitness-primary);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-image: 
+      radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* Custom animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.5); }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s ease-out forwards;
+}
+
+/* Utility classes */
+.gradient-primary {
+  background: var(--gradient-primary);
+}
+
+.gradient-secondary {
+  background: var(--gradient-secondary);
+}
+
+.gradient-surface {
+  background: var(--gradient-surface);
+}
+
+.shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+
+.shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(26, 26, 46, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--fitness-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--fitness-primary);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--fitness-primary-light);
+}
+
+/* Sound wave animation for generate program page */
+@keyframes sound-wave {
+  0% {
+    height: 10%;
+  }
+  50% {
+    height: 100%;
+  }
+  100% {
+    height: 10%;
+  }
+}
+
+.animate-sound-wave {
+  animation: sound-wave 1.2s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+/* Scanline animation for generate program page */
+@keyframes scanline {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100%;
+  }
+}
+
+.animate-scanline {
+  animation: scanline 8s linear infinite;
+}
+
+@keyframes slow-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-slow-spin {
+  animation: slow-spin 12s linear infinite;
+}
+
+
+
