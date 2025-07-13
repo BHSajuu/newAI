@@ -1,6 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isProtectedRoute = createRouteMatcher(["/generate-program", "/profile"]);
+// ADDED: Progress tracker route to protected routes
+const isProtectedRoute = createRouteMatcher(["/generate-program", "/profile", "/progress-tracker"]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) await auth.protect();

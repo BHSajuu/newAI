@@ -67,4 +67,30 @@ export default defineSchema({
   }).index("by_user_id",["userId"])
     .index("by_rating",["rating"])
     .index("by_plan_id",["planId"]),
+
+  // ADDED: Progress tracking table for daily workout and diet updates
+  progress: defineTable({
+    userId: v.string(),
+    userName: v.string(),
+    date: v.string(), // YYYY-MM-DD format
+    workoutCompleted: v.array(v.object({
+      exerciseName: v.string(),
+      setsCompleted: v.number(),
+      repsCompleted: v.number(),
+      notes: v.optional(v.string()),
+    })),
+    dietCompleted: v.array(v.object({
+      mealName: v.string(),
+      foodsConsumed: v.array(v.string()),
+      caloriesConsumed: v.number(),
+      notes: v.optional(v.string()),
+    })),
+    totalCaloriesConsumed: v.number(),
+    waterIntake: v.number(), // in liters
+    weight: v.optional(v.number()), // daily weight tracking
+    notes: v.optional(v.string()),
+  })
+    .index("by_user_id", ["userId"])
+    .index("by_user_date", ["userId", "date"])
+    .index("by_date", ["date"]),
 });

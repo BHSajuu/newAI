@@ -1,7 +1,7 @@
 "use client";
 
 import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
-import { DumbbellIcon, HomeIcon, Menu, UserIcon, X, ZapIcon } from "lucide-react";
+import { DumbbellIcon, HomeIcon, Menu, UserIcon, X, ZapIcon, ActivityIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
@@ -51,6 +51,11 @@ const Navbar = () => {
               <DumbbellIcon size={18} />
               <span>Generate Program</span>
             </Link>
+            {/* ADDED: Progress Tracker link for mobile */}
+            <Link href="/progress-tracker" className="flex items-center gap-2 text-sm hover:text-primary transition-colors p-2 rounded-lg hover:bg-primary/10" onClick={closeMobileMenu}>
+              <ActivityIcon size={18} />
+              <span>Progress Tracker</span>
+            </Link>
             <Link href="/profile" className="flex items-center gap-2 text-sm hover:text-primary transition-colors p-2 rounded-lg hover:bg-primary/10" onClick={closeMobileMenu}>
               <UserIcon size={18} />
               <span>Profile</span>
@@ -71,6 +76,11 @@ const Navbar = () => {
               <Link href="/generate-program" className="flex items-center gap-2 text-sm hover:text-primary transition-colors px-3 py-2 rounded-lg hover:bg-primary/10">
                 <DumbbellIcon size={16} />
                 <span>Generate</span>
+              </Link>
+              {/* ADDED: Progress Tracker link for desktop */}
+              <Link href="/progress-tracker" className="flex items-center gap-2 text-sm hover:text-primary transition-colors px-3 py-2 rounded-lg hover:bg-primary/10">
+                <ActivityIcon size={16} />
+                <span>Progress</span>
               </Link>
               <Link href="/profile" className="flex items-center gap-2 text-sm hover:text-primary transition-colors px-3 py-2 rounded-lg hover:bg-primary/10">
                 <UserIcon size={16} />

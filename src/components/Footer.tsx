@@ -61,6 +61,13 @@ const Footer = () => {
                 Generate Program
               </Link>
 
+              {/* ADDED: Progress Tracker link in footer */}
+              <Link
+                href="/progress-tracker"
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                Progress Tracker
+              </Link>
               <Link
                 href="/contact"
                 onClick={() => toast.success("Redirecting to contact page...")}
